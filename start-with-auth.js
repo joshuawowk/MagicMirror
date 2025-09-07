@@ -57,16 +57,16 @@ async function startMagicMirror() {
     process.env.CALDAV_USERNAME = username;
     process.env.CALDAV_PASSWORD = password;
     
-    console.log('Starting MagicMirror...');
+    console.log('Starting MagicMirror server...');
     
-    // Start MagicMirror
-    const mm = spawn('npm', ['start'], {
+    // Start MagicMirror server only
+    const mm = spawn('node', ['--run', 'server'], {
       stdio: 'inherit',
       env: process.env
     });
     
     mm.on('close', (code) => {
-      console.log(`MagicMirror exited with code ${code}`);
+      console.log(`MagicMirror server exited with code ${code}`);
     });
     
   } catch (error) {

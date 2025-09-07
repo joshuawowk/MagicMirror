@@ -1,0 +1,50 @@
+name: magicmirror
+services:
+  init:
+    container_name: mm-init
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo "change permissions for mounted folders ..."
+        cd /magicmirror
+        chown -R 1000:1000 mounts
+        chmod -R 777 mounts
+        git config --global --add safe.directory /magicmirror
+        git update-index --assume-unchanged mounts/css/custom.css
+        echo "done."
+    environment:
+      MM_CHMOD: "777"
+      MM_GID: "1000"
+      MM_UID: "1000"
+    image: karsten13/magicmirror:latest
+    networks:
+      - internal
+    user: root
+    volumes:
+      - type: bind
+        source: /home/jwowk/repos/magicmirror
+        target: /magicmirror
+        bind:
+          create_host_path: true
+  magicmirror:
+    container_name: mm
+    environment:
+      MM_CUSTOMCSS_FILE: css/custom.css
+      MM_MODULES_DIR: modules
+      MM_OVERRIDE_DEFAULT_MODULES: "true"
+      MM_SCENARIO: server
+      MM_SHOW_CURSOR: "false"
+    image: karsten13/magicmirror:latest
+    networks:
+      - internal
+    ports:
+      - '8888:8080'
+    restart: always
+    volumes:
+      - /home/jwowk/repos/magicmirror/mounts/config:/opt/magic_mirror/config
+      - /home/jwowk/repos/magicmirror/mounts/modules:/opt/magic_mirror/modules
+      - /home/jwowk/repos/magicmirror/mounts/css/custom.css:/opt/magic_mirror/css/custom.css
+networks:
+  internal:
+    external: true
